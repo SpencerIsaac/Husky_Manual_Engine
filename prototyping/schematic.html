@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HuskyADAPT Soldering Diagram Export</title>
+    <style>
+        :root { --uw-purple: #4b2e83; --uw-gold: #b7a57a; --bg: #f4f4f4; }
+        body { font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .workspace { display: flex; gap: 30px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 10px solid var(--uw-purple); }
+        .controls { width: 300px; }
+        .preview-area { display: flex; flex-direction: column; align-items: center; justify-content: center; border-left: 2px solid #eee; padding-left: 30px; }
+        canvas { background: white; border: 1px solid #ddd; }
+        .pin-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 10px; }
+        .pin-btn { padding: 8px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 12px; font-weight: bold; }
+        .pin-btn.active { background: var(--uw-purple); color: white; border-color: var(--uw-purple); }
+        select, input { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; box-sizing: border-box; }
+        label { font-size: 11px; font-weight: bold; text-transform: uppercase; color: #555; display: block; margin-bottom: 5px; }
+        .export-btn { margin-top: 20px; width: 100%; padding: 15px; background: #2e7d32; color: white; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+    </style>
+</head>
+<body>
+
+<div class="workspace">
+    <div class="controls">
+        <h2 style="color: var(--uw-purple); margin-top:0;">Soldering Pin Diagram</h2>
+        
+        <label>Component Label</label>
+        <input type="text" id="labelInput" value="Foot" oninput="draw()">
+
+        <label>Layout Type</label>
+        <select id="layoutSelect" onchange="initUI()">
+            <option value="double">Double Array (Staggered)</option>
+            <option value="single">Single Array (Linear)</option>
+        </select>
+
+        <label>Number of Pins</label>
+        <input type="number" id="pinCount" value="9" min="1" max="15" oninput="initUI()">
+
+        <label>Select Solder Pins</label>
+        <div class="pin-grid" id="pinGrid"></div>
+
+        <button class="export-btn" onclick="downloadImage()">Download for Word</button>
+    </div>
+
+    <div class="preview-area">
+        <label>PNG Preview</label>
+        <canvas id="schematicCanvas" width="400" height="300"></canvas>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('schematicCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    let activePins = new Set([5, 6]); // Default soldering points
+    let pins = [];
+
+    // This function calculates coordinates based on the selected layout
+    function calculatePinPositions() {
+        const count = parseInt(document.getElementById('pinCount').value) || 0;
+        const layout = document.getElementById('layoutSelect').value;
+        pins = [];
+
+        if (layout === 'single') {
+            const spacing = 45;
+            const startX = 200 - ((count - 1) * spacing) / 2;
+            for (let i = 1; i <= count; i++) {
+                pins.push({ id: i, x: startX + (i - 1) * spacing, y: 150 });
+            }
+        } else {
+            // Double Array Logic (Top-heavy split)
+            const topCount = Math.ceil(count / 2);
+            const botCount = Math.floor(count / 2);
+            const spacing = 50;
+
+            const topStartX = 200 - ((topCount - 1) * spacing) / 2;
+            for (let i = 1; i <= topCount; i++) {
+                pins.push({ id: i, x: topStartX + (i - 1) * spacing, y: 110 });
+            }
+
+            const botStartX = 200 - ((botCount - 1) * spacing) / 2;
+            for (let i = 1; i <= botCount; i++) {
+                pins.push({ id: i + topCount, x: botStartX + (i - 1) * spacing, y: 190 });
+            }
+        }
+    }
+
+    function initUI() {
+        const grid = document.getElementById('pinGrid');
+        const count = parseInt(document.getElementById('pinCount').value) || 0;
+        grid.innerHTML = '';
+        
+        // Ensure active pins set doesn't have IDs higher than the current count
+        const currentActive = Array.from(activePins);
+        activePins = new Set(currentActive.filter(id => id <= count));
+
+        for (let i = 1; i <= count; i++) {
+            const btn = document.createElement('button');
+            btn.innerText = i;
+            btn.className = `pin-btn ${activePins.has(i) ? 'active' : ''}`;
+            btn.onclick = () => {
+                if (activePins.has(i)) activePins.delete(i);
+                else activePins.add(i);
+                initUI(); // Re-render buttons and canvas
+            };
+            grid.appendChild(btn);
+        }
+        
+        calculatePinPositions();
+        draw();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const label = document.getElementById('labelInput').value;
+
+        // 1. Draw Container
+        ctx.strokeStyle = '#333';
+        ctx.lineWidth = 2;
+        roundRect(ctx, 40, 65, 320, 185, 20);
+
+        // 2. Draw Label
+        ctx.font = 'bold 18px Arial';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.fillText(`"${label}"`, 200, 45);
+
+        // 3. Draw Pins from the calculated array
+        pins.forEach(pin => {
+            const isActive = activePins.has(pin.id);
+            
+            ctx.beginPath();
+            ctx.ellipse(pin.x, pin.y, 18, 26, 0, 0, Math.PI * 2);
+            
+            if (isActive) {
+                ctx.strokeStyle = 'red';
+                ctx.lineWidth = 3;
+                ctx.fillStyle = 'white';
+            } else {
+                ctx.strokeStyle = '#999';
+                ctx.lineWidth = 1;
+                ctx.fillStyle = '#ced4da';
+            }
+            
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.fillStyle = 'black';
+            ctx.font = isActive ? 'bold 18px Arial' : '16px Arial';
+            ctx.fillText(pin.id, pin.x, pin.y + 6);
+            
+            if (isActive) {
+                ctx.beginPath();
+                ctx.moveTo(pin.x - 8, pin.y + 11);
+                ctx.lineTo(pin.x + 8, pin.y + 11);
+                ctx.stroke();
+            }
+        });
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.stroke();
+    }
+
+    function downloadImage() {
+        const link = document.createElement('a');
+        link.download = `HuskyADAPT_${document.getElementById('labelInput').value}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+
+    // Launch!
+    initUI();
+</script>
+
+</body>
+</html>

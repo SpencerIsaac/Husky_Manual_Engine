@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuskyADAPT | Interactive Universal Manual</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --uw-purple: #4b2e83;
+            --uw-gold: #b7a57a;
+            --success: #28a745;
+            --danger: #d32f2f;
+            --bg: #f4f4f9;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Progress Header */
+        .header {
+            position: sticky;
+            top: 0;
+            width: 100%;
+            background: var(--uw-purple);
+            color: white;
+            padding: 15px 0;
+            z-index: 1000;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .progress-container {
+            width: 85%;
+            background: rgba(255,255,255,0.2);
+            height: 10px;
+            border-radius: 5px;
+            margin: 10px auto;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: var(--uw-gold);
+            transition: width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Container */
+        .manual-feed {
+            width: 95%;
+            max-width: 700px;
+            margin: 20px 0 100px 0;
+        }
+
+        .section-header {
+            color: var(--uw-purple);
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin: 30px 0 15px 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-left: 4px solid var(--uw-gold);
+            padding-left: 10px;
+        }
+
+        /* Step Cards */
+        .step-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border: 1px solid #e0e0e0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .step-card.completed {
+            background: #f0fff4;
+            border-color: var(--success);
+            opacity: 0.6;
+        }
+
+        .step-card:active { transform: scale(0.98); }
+
+        .step-num {
+            font-weight: 800;
+            color: var(--uw-purple);
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .step-text {
+            font-size: 1.05rem;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        /* Elements */
+        .var { color: var(--uw-purple); font-weight: 700; background: #eee; padding: 0 4px; border-radius: 3px; }
+        
+        .note, .tip, .caution, .checkpoint {
+            margin-top: 12px;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .note { background: #e7f3ff; border-left: 4px solid #007bff; color: #004085; }
+        .tip { background: #fff9db; border-left: 4px solid #fab005; color: #856404; }
+        .caution { background: #fff5f5; border-left: 4px solid var(--danger); color: var(--danger); font-weight: 600; }
+        .checkpoint { background: #f3f0ff; border: 2px dashed var(--uw-purple); text-align: center; font-weight: 700; }
+
+        /* Completion Modal */
+        #finish-screen {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: white;
+            z-index: 2000;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .btn-restart {
+            background: var(--uw-purple);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 700;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div style="font-weight: 800; font-size: 1.3rem;">HuskyADAPT <span style="font-weight: 400; opacity: 0.8;">| Manual</span></div>
+    <div class="progress-container"><div id="progress-bar"></div></div>
+    <div id="status">0 of 21 Steps Completed</div>
+</div>
+
+<div class="manual-feed">
+    
+    <div class="section-header">Part 1: Initial Assessment</div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">1.1</div>
+        <div class="step-text">Remove the toy from the package.</div>
+        <div class="note"><b>Note:</b> If you intend to donate the toy, be careful not to damage the packaging.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">1.3</div>
+        <div class="step-text">Use the power switch to turn the toy on.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">1.4</div>
+        <div class="step-text">Choose the function you want the switch to activate: <span class="var">{Function}</span>.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">1.5</div>
+        <div class="step-text">Press the <span class="var">{Function}</span> button(s) to assess the functionality.</div>
+        <div class="tip"><b>Tip:</b> If buttons do not work, check or replace the batteries.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">1.6</div>
+        <div class="step-text">Use the power switch to turn the toy off.</div>
+    </div>
+
+    <div class="section-header">Part 2: Disassembly</div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">2.1</div>
+        <div class="step-text">Use the <span class="var">{Screw driver}</span> screwdriver to unscrew the eight base attachment screws.</div>
+        <div class="caution"><b>CAUTION:</b> Do not exert excessive force; do not strip the screws.</div>
+        <div class="tip"><b>Tip:</b> Store screws in a small cup so they don't get lost.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">2.2</div>
+        <div class="step-text">Remove the cover for the toy.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">2.4</div>
+        <div class="step-text">Identify the two circuit pins for <span class="var">{Function}</span>. Refer to Fig 2.4.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">2.5</div>
+        <div class="step-text">Touch the two pins with a test wire. The <span class="var">{Function}</span> should activate.</div>
+        <div class="note">If it doesn't activate, check batteries, the power switch, and wire breaks.</div>
+    </div>
+
+    <div class="section-header">Part 3: Modification</div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">3.1 / 3.2</div>
+        <div class="step-text">Unscrew the battery compartment and remove the batteries.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">3.3</div>
+        <div class="step-text">Mark the exit hole spot on the <span class="var">{Toy Name}</span>. We recommend the location in Fig 3.3.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">3.4 / 3.5</div>
+        <div class="step-text">Drill the hole perpendicularly (Forward setting). Clean the edges with a file.</div>
+        <div class="caution"><b>SAFETY:</b> Wear goggles while operating the drill.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">3.6</div>
+        <div class="step-text">Strip 1 inch of the cable ends, then strip 1/4 inch of insulation off each wire.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">3.7 / 3.8</div>
+        <div class="step-text">Thread cable through the hole. Tie a knot or use hot glue/zip tie inside for security.</div>
+        <div class="tip">Maximize external length while ensuring internal length reaches the board.</div>
+    </div>
+
+    <div class="section-header">Part 4: Soldering</div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">4.1</div>
+        <div class="step-text">Solder the two audio jack wires to the pins noted in 2.4.</div>
+        <div class="caution"><b>SAFETY:</b> Wear goggles. Avoid overflow; wire should only contact one pin.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">4.2</div>
+        <div class="step-text">Gently tug the wires to verify a strong connection. If they pop off, re-solder.</div>
+    </div>
+
+    <div class="section-header">Part 5: Final Testing</div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">5.1 - 5.3</div>
+        <div class="step-text">Reinsert batteries, replace compartment screws, and turn the toy on.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">5.4 / 5.5</div>
+        <div class="step-text">Plug the switch into the jack and test functionality while the toy is still open.</div>
+        <div class="checkpoint">🚩 LEAD CHECKPOINT: Ask a leader to inspect your soldering work.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">5.7 / 5.8</div>
+        <div class="step-text">Press the base back into the body (don't pinch wires) and replace the 8 screws.</div>
+        <div class="caution"><b>CAUTION:</b> Do not over-tighten; avoid stripping the heads.</div>
+    </div>
+
+    <div class="step-card" onclick="toggleStep(this)">
+        <div class="step-num">5.9</div>
+        <div class="step-text">Final test with the toy closed. Check all original buttons too.</div>
+        <div class="checkpoint">🚩 FINAL CHECKPOINT: Ask a leader for a final inspection.</div>
+    </div>
+
+    <div class="step-card" style="background: var(--uw-purple); color: white; text-align: center; border: none; box-shadow: 0 10px 20px rgba(75, 46, 131, 0.3);" onclick="toggleStep(this)">
+        <div class="step-text" style="color: white;">
+            <span style="font-size: 1.5rem; display: block; margin-bottom: 10px;">🎉</span>
+            <b>5.10 CONGRATULATIONS!</b><br>
+            You have successfully adapted the 
+            <span class="var" style="background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5);">
+                {Toy Name}
+            </span>
+        </div>
+    </div>
+
+</div>
+
+<div id="finish-screen">
+    <h1 style="color: var(--uw-purple); font-size: 3rem;">🎉 DONE!</h1>
+    <p>The <span class="var">{Toy Name}</span> is ready for play.</p>
+    <button class="btn-restart" onclick="location.reload()">Reset Manual</button>
+</div>
+
+<script>
+    function toggleStep(card) {
+        card.classList.toggle('completed');
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const steps = document.querySelectorAll('.step-card');
+        const completed = document.querySelectorAll('.step-card.completed').length;
+        const progress = (completed / steps.length) * 100;
+        
+        document.getElementById('progress-bar').style.width = progress + '%';
+        document.getElementById('status').innerText = `${completed} of ${steps.length} Steps Completed`;
+
+        if (completed === steps.length) {
+            setTimeout(() => {
+                document.getElementById('finish-screen').style.display = 'flex';
+            }, 500);
+        }
+    }
+</script>
+
+</body>
+</html>

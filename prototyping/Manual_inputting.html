@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuskyADAPT | Ingestion Engine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --uw-purple: #4b2e83;
+            --uw-gold: #b7a57a;
+            --uw-metallic: #85754d;
+            --bg: #f0f2f5;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --border: #e0e0e0;
+            --radius: 12px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 550px;
+            margin-bottom: 50px;
+        }
+
+        /* Branding Header */
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 { 
+            font-size: 28px; 
+            font-weight: 800; 
+            letter-spacing: -1px;
+            margin: 0; 
+            color: var(--uw-purple); 
+        }
+
+        .sub-header {
+            color: var(--uw-metallic);
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 5px;
+        }
+
+        /* Form Sections as Cards */
+        .section-card {
+            background: var(--card);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--uw-metallic);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .form-group { margin-bottom: 20px; }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: var(--uw-purple);
+        }
+
+        .required-star { color: #d32f2f; margin-left: 2px; }
+
+        /* Inputs & Selects */
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #edf0f2;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            background: #fcfcfc;
+        }
+
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: var(--uw-purple); 
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(75, 46, 131, 0.1);
+        }
+
+        /* Chips */
+        .chip-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .chip {
+            padding: 10px 16px;
+            border: 2px solid #edf0f2;
+            border-radius: 20px;
+            background: white;
+            color: #666;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chip.active {
+            background: var(--uw-purple);
+            color: white;
+            border-color: var(--uw-purple);
+        }
+
+        .chip:hover:not(.active) {
+            border-color: var(--uw-gold);
+            color: var(--uw-purple);
+        }
+
+        /* Action Footer */
+        .submit-container {
+            position: sticky;
+            bottom: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: var(--radius);
+            box-shadow: 0 -10px 20px rgba(0,0,0,0.05);
+            border: 1px solid var(--border);
+            z-index: 100;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: var(--uw-purple);
+            color: white;
+            padding: 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: #321f57;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(75, 46, 131, 0.3);
+        }
+
+        .legend {
+            text-align: center;
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>HuskyADAPT</h1>
+        <div class="sub-header">Ingestion Engine v2.0</div>
+    </header>
+
+    <div class="legend">
+        Mandatory fields marked with <span class="required-star">*</span>
+    </div>
+
+    <div class="section-card">
+        <div class="section-title">Core Identification</div>
+        
+        <div class="form-group">
+            <label>Toy Name<span class="required-star">*</span></label>
+            <input type="text" placeholder="e.g. Fisher-Price Laugh & Learn Piano">
+        </div>
+
+        <div class="form-group">
+            <label>Brand<span class="required-star">*</span></label>
+            <input type="text" placeholder="e.g. Mattel / Fisher-Price">
+        </div>
+
+        <div style="display: flex; gap: 15px;">
+            <div class="form-group" style="flex: 1;">
+                <label>UPC Code<span class="required-star">*</span></label>
+                <input type="text" placeholder="Barcode Number">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label>Purchase Link<span class="required-star">*</span></label>
+                <input type="text" placeholder="URL">
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-title">Technical Specifications</div>
+        
+        <div class="form-group">
+            <label>Toy Features</label>
+            <div class="chip-group">
+                <div class="chip active">Light</div>
+                <div class="chip">Sound</div>
+                <div class="chip">Motion</div>
+                <div class="chip">Vibration</div>
+                <div class="chip">Bluetooth</div>
+                <div class="chip">Touch-Sensitive</div>
+            </div>
+        </div>
+
+        <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+            <label>Battery Power<span class="required-star">*</span></label>
+            <div style="display: flex; gap: 15px; margin-top: 10px;">
+                <div style="flex: 2;">
+                    <select>
+                        <option value="">-- Type --</option>
+                        <option>AA</option>
+                        <option>AAA</option>
+                        <option>C</option>
+                        <option>D</option>
+                        <option>9V</option>
+                        <option>Coin Cell</option>
+                    </select>
+                </div>
+                <div style="flex: 1;">
+                    <select>
+                        <option>Qty: 0</option>
+                        <option selected>Qty: 1</option>
+                        <option>Qty: 2</option>
+                        <option>Qty: 3</option>
+                        <option>Qty: 4</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <div class="section-title">Modification Mapping</div>
+
+        <div class="form-group">
+            <label>Adapted Function<span class="required-star">*</span></label>
+            <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <button type="button" class="chip active" style="flex: 1; border-radius: 8px;">Standard On/Off</button>
+                <button type="button" class="chip" style="flex: 1; border-radius: 8px;">Custom Function</button>
+            </div>
+            <input type="text" placeholder="Function Name (e.g. Red Sparkle Button)" style="border-style: dashed; border-color: var(--uw-gold);">
+        </div>
+
+        <div class="form-group">
+            <label>Screwdriver Type<span class="required-star">*</span></label>
+            <select style="font-size: 15px;">
+                <option value="" disabled selected>Select the required tool...</option>
+                <option value="phillips">Phillips Head</option>
+                <option value="flathead">Flathead</option>
+                <option value="star">Star (Torx)</option>
+                <option value="specialized">Specialized / Security</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="submit-container">
+        <button class="submit-btn">Register Manual Entry</button>
+        <div style="text-align: center; margin-top: 10px; font-size: 11px; color: #aaa;">
+            Data will be transformed into the HuskyADAPT JSON Schema
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

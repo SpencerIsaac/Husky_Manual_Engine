@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HuskyADAPT | Full Script Ingestion</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --uw-purple: #4b2e83; --uw-gold: #b7a57a; --bg: #f0f2f5; --border: #e0e0e0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; display: flex; height: 100vh; overflow: hidden; }
+        
+        /* Layout */
+        .editor { width: 45%; padding: 30px; overflow-y: auto; background: white; border-right: 2px solid var(--border); }
+        .preview { width: 55%; padding: 40px; overflow-y: auto; background: #fafafa; }
+        
+        /* UI Elements */
+        .section-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        h3 { font-size: 11px; text-transform: uppercase; color: var(--uw-gold); margin-top: 0; letter-spacing: 1px; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 15px; }
+        
+        label { display: block; font-size: 11px; font-weight: 800; color: var(--uw-purple); margin-bottom: 5px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 10px; border: 1.5px solid #eee; border-radius: 6px; margin-bottom: 15px; box-sizing: border-box; }
+        
+        /* Manual Styling */
+        .m-step { background: white; padding: 15px; margin-bottom: 12px; border-left: 4px solid #eee; border-radius: 4px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .m-step.active-step { border-left-color: var(--uw-purple); }
+        .m-num { font-weight: 800; color: var(--uw-purple); font-size: 0.8rem; margin-right: 8px; }
+        .m-text { font-size: 0.95rem; color: #333; }
+        .var-fill { color: var(--uw-purple); font-weight: 700; border-bottom: 1px solid var(--uw-gold); }
+        
+        /* Caution/Tip Boxes */
+        .m-caution { background: #fff5f5; border-left: 4px solid #d32f2f; padding: 10px; margin-top: 8px; font-size: 0.85rem; color: #d32f2f; font-weight: 600; }
+        .m-tip { background: #fffdf0; border-left: 4px solid #fab005; padding: 10px; margin-top: 8px; font-size: 0.85rem; color: #856404; }
+        .m-img-placeholder { width: 100%; height: 120px; background: #f0f0f0; border: 2px dashed #ccc; margin-top: 10px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #999; font-size: 11px; }
+    </style>
+</head>
+<body>
+
+<div class="editor">
+    <h1 style="color: var(--uw-purple); font-size: 1.5rem;">Ingestion Engine</h1>
+    <p style="font-size: 0.8rem; color: #888; margin-bottom: 30px;">Populate the universal skeleton below.</p>
+
+    <div class="section-card">
+        <h3>1. Global Variables</h3>
+        <label>Toy Name</label>
+        <input type="text" id="in-name" placeholder="e.g. Fisher-Price Piano" oninput="sync()">
+        
+        <label>Adapted Function</label>
+        <input type="text" id="in-func" placeholder="e.g. Foot Switch" oninput="sync()">
+        
+        <label>Required Screwdriver</label>
+        <select id="in-tool" onchange="sync()">
+            <option value="{Screw Driver}">Select Tool...</option>
+            <option value="Phillips #1">Phillips #1</option>
+            <option value="Flathead">Flathead</option>
+            <option value="Torx T10">Torx T10</option>
+        </select>
+    </div>
+
+    <div class="section-card">
+        <h3>2. Media Uploads</h3>
+        <label>1.2 Specialized Step Photo</label>
+        <input type="file" accept="image/*">
+        
+        <label>2.4 Circuit/Pins Photo</label>
+        <input type="file" accept="image/*">
+        
+        <label>3.3 Drill Location Photo</label>
+        <input type="file" accept="image/*">
+    </div>
+
+    <button style="width:100%; padding:15px; background:var(--uw-purple); color:white; border:none; border-radius:8px; font-weight:800; cursor:pointer;">
+        FINALIZE & SYNC TO CLOUD
+    </button>
+</div>
+
+<div class="preview">
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h2 id="out-name" style="color:var(--uw-purple); margin-bottom:5px;">{Toy Name}</h2>
+        <div style="font-size: 10px; font-weight: 800; color: var(--uw-gold); text-transform: uppercase;">Universal Adaptation Manual</div>
+    </div>
+
+    <div id="manual-skeleton">
+        <div class="m-step active-step">
+            <span class="m-num">1.1</span>
+            <span class="m-text">Remove the toy from the package.</span>
+            <div class="m-tip">Note: If you intend to donate the toy, be careful not to damage the packaging.</div>
+        </div>
+
+        <div class="m-step">
+            <span class="m-num">1.4</span>
+            <span class="m-text">Choose the function you want the switch to activate: <span id="out-func" class="var-fill">{Function}</span>.</span>
+        </div>
+
+        <div class="m-step">
+            <span class="m-num">1.5</span>
+            <span class="m-text">Press the <span class="out-func-dup var-fill">{Function}</span> button to assess functionality.</span>
+        </div>
+
+        <div class="m-step active-step">
+            <span class="m-num">2.1</span>
+            <span class="m-text">Use the <span id="out-tool" class="var-fill">{Screw Driver}</span> screwdriver to unscrew the eight base attachment screws.</span>
+            <div class="m-caution">Caution: Be careful not to exert excessive force and strip the screws.</div>
+            <div class="m-tip">Tip: Store the removed screws in a small cup so as not to lose them.</div>
+        </div>
+
+        <div class="m-step">
+            <span class="m-num">3.3</span>
+            <span class="m-text">Mark a spot on the <span class="out-name-dup var-fill">{Toy Name}</span> body for the exit hole.</span>
+            <div class="m-img-placeholder">Fig 3.3: Recommended Drill Location</div>
+        </div>
+
+        <div class="m-step">
+            <span class="m-num">3.4</span>
+            <span class="m-text">Use the drill to bore an exit hole. Ensure drill is in <b>FORWARDS</b>.</span>
+            <div class="m-caution">Caution: Wear safety goggles and exercise caution.</div>
+        </div>
+
+        <div class="m-step active-step">
+            <span class="m-num">4.1</span>
+            <span class="m-text">Solder the audio jack wires to the pins noted in Part 2.4.</span>
+            <div class="m-tip">Tip: Solder and wire should only contact one pin (avoid overflow).</div>
+        </div>
+
+        <div class="m-step">
+            <span class="m-num">5.8</span>
+            <span class="m-text">Use the Phillips head screwdriver to replace the screws.</span>
+            <div class="m-caution">Caution: Stop turning as soon as you feel resistance to prevent stripping.</div>
+        </div>
+
+        <div id="final-card" style="background:var(--uw-purple); color:white; padding:20px; text-align:center; border-radius:8px; margin-top:30px;">
+            <b style="color:white;">5.10 CONGRATULATIONS!</b><br>
+            <span style="color:white;">You successfully adapted the <span class="out-name-dup" style="color:white; font-weight:800;">{Toy Name}</span>.</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    function sync() {
+        const name = document.getElementById('in-name').value || "{Toy Name}";
+        const func = document.getElementById('in-func').value || "{Function}";
+        const tool = document.getElementById('in-tool').value;
+
+        // Sync Title
+        document.getElementById('out-name').innerText = name;
+        
+        // Sync All Instances of Toy Name
+        document.querySelectorAll('.out-name-dup').forEach(el => el.innerText = name);
+        
+        // Sync Function
+        document.getElementById('out-func').innerText = func;
+        document.querySelectorAll('.out-func-dup').forEach(el => el.innerText = func);
+
+        // Sync Tool
+        document.getElementById('out-tool').innerText = tool;
+    }
+</script>
+
+</body>
+</html>
