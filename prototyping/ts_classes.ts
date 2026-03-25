@@ -1,4 +1,4 @@
-import type { LanguageCode } from './constants/languages';
+import { LanguageCode } from './constants/languages';
 type BatteryType = 'AA' | 'AAA' | 'C' | 'D' | '9V' | 'Button Cell' | 'other/none';
 type toyFeature = 'Light-Up' | 'Sound' | 'Motion'| 'Vibration' | 'Remote-Controlled';
 // Should screwdriver type be type classification? Or just a string?

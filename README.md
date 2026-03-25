@@ -1,73 +1,35 @@
-# React + TypeScript + Vite
+## Project Overview
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This software implements an **Extract-Transform-Load (ETL)** framework:
+- **Extract:** An intuitive contributor interface for crowd-sourced toy modifications.
+- **Transform:** A universal schema that validates data and ensures high accessibility standards (Alt-text, Braille-readiness).
+- **Load:** A headless content design that serves manuals as HTML, adjustable-size text, or downloadable formats.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Frontend:** React + TypeScript + Vite
+- **Backend/Logic:** C++ (Data Processing & Schema Validation)
+- **Database & Storage:** Supabase (PostgreSQL & S3-compatible buckets for photos)
+- **API:** RESTful architecture for resource discoverability
 
-## React Compiler
+## Project Structure
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- `/src`: React components and TypeScript interfaces.
+- `/cpp`: Core C++ logic for high-performance data transformation.
+- `/supabase`: Database migrations and schema definitions.
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+1. **Clone the repo**
+2. **Install dependencies:** `npm install`
+3. **Configure Environment:** Create a `.env.local` with your `SUPABASE_URL` and `SUPABASE_ANON_KEY`.
+4. **Run Dev Server:** `npm run dev`
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Accessibility Goals
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Our mission is to ensure that no "accessibility silo" prevents a child from playing. We prioritize:
+- Automatic Alt-text enforcement.
+- Low-bandwidth data transfer for rural access.
+- Native support for screen readers and Braille translation.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
