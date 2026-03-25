@@ -1,0 +1,113 @@
+-- Husky Manual Engine
+-- Baseline schema migration aligned with src/types.ts as of 2026-03-25.
+--
+-- This migration is written to be safe to review and re-run in development:
+-- - CREATE ... IF NOT EXISTS is used where possible
+-- - enum creation is guarded with pg_type checks
+-- - trigger replacement is explicit
+--
+-- If your hosted Supabase project already has a different live schema,
+-- review this file before applying it so we can convert it into ALTER statements
+-- instead of creating parallel structures.
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'battery_type') THEN
+    CREATE TYPE battery_type AS ENUM (
+      'AA',
+      'AAA',
+      'C',
+      'D',
+      '9V',
+      'Button Cell',
+      'other/none'
+    );
+  END IF;
+END
+$$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'toy_feature') THEN
+    CREATE TYPE toy_feature AS ENUM (
+      'Light-Up',
+      'Sound',
+      'Motion',
+      'Vibration',
+      'Remote-Controlled'
+    );
+  END IF;
+END
+$$;
+
+CREATE TABLE IF NOT EXISTS public.toy_metadata (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  name jsonb NOT NULL DEFAULT '{}'::jsonb,
+  brand text NOT NULL,
+  upc text NOT NULL UNIQUE,
+  purchase_link text NOT NULL,
+  screw_type jsonb NOT NULL DEFAULT '{}'::jsonb,
+  battery_type battery_type NOT NULL,
+  battery_count integer NOT NULL CHECK (battery_count >= 0),
+  toy_feature toy_feature[] NOT NULL DEFAULT '{}'::toy_feature[],
+  contributor text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS public.pictures (
+  picture_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  toy_id uuid NOT NULL REFERENCES public.toy_metadata(id) ON DELETE CASCADE,
+  picture_url text NOT NULL,
+  alt_text jsonb NOT NULL DEFAULT '{}'::jsonb,
+  caption jsonb NOT NULL DEFAULT '{}'::jsonb
+);
+
+CREATE TABLE IF NOT EXISTS public.instruction_steps (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  toy_id uuid NOT NULL REFERENCES public.toy_metadata(id) ON DELETE CASCADE,
+  picture_id uuid NOT NULL REFERENCES public.pictures(picture_id) ON DELETE RESTRICT,
+  step_number integer NOT NULL CHECK (step_number > 0),
+  description jsonb NOT NULL DEFAULT '{}'::jsonb,
+  UNIQUE (toy_id, step_number)
+);
+
+CREATE INDEX IF NOT EXISTS idx_pictures_toy_id
+  ON public.pictures (toy_id);
+
+CREATE INDEX IF NOT EXISTS idx_instruction_steps_toy_id
+  ON public.instruction_steps (toy_id);
+
+CREATE INDEX IF NOT EXISTS idx_instruction_steps_picture_id
+  ON public.instruction_steps (picture_id);
+
+CREATE INDEX IF NOT EXISTS idx_toy_metadata_name
+  ON public.toy_metadata
+  USING gin (name);
+
+CREATE INDEX IF NOT EXISTS idx_pictures_alt_text
+  ON public.pictures
+  USING gin (alt_text);
+
+CREATE INDEX IF NOT EXISTS idx_instruction_steps_description
+  ON public.instruction_steps
+  USING gin (description);
+
+CREATE OR REPLACE FUNCTION public.set_updated_at()
+RETURNS trigger AS $$
+BEGIN
+  NEW.updated_at = now();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS set_toy_metadata_updated_at ON public.toy_metadata;
+
+CREATE TRIGGER set_toy_metadata_updated_at
+BEFORE UPDATE ON public.toy_metadata
+FOR EACH ROW
+EXECUTE FUNCTION public.set_updated_at();
