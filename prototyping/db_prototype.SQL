@@ -1,3 +1,4 @@
+-- March 25th 2026
 -- Prototype Supabase/Postgres schema aligned with src/types.ts
 -- Localized text fields are stored as JSONB objects keyed by language code.
 -- Example: {"en": "Toy name", "es": "Nombre del juguete"}

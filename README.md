@@ -1,6 +1,6 @@
 ## Husky Manual Engine
 
-Husky Manual Engine is an early-stage toy adaptation platform focused on turning hands-on adaptation knowledge into structured, accessible manuals.
+Husky Manual Engine is a toy adaptation platform focused on turning hands-on adaptation knowledge into structured, accessible manuals.
 
 The core idea is:
 - collect toy metadata and adaptation details from contributors
