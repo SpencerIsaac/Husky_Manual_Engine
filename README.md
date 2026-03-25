@@ -1,59 +1,72 @@
 ## Husky Manual Engine
 
-Husky Manual Engine is a toy adaptation platform focused on turning hands-on adaptation knowledge into structured, accessible manuals.
+Husky Manual Engine is an early-stage platform for turning toy adaptation knowledge into structured, accessible manuals.
 
-The core idea is:
-- collect toy metadata and adaptation details from contributors
-- store that information in a reusable schema
-- publish manuals in formats that are easier to search, translate, and adapt for accessibility
+The project started from a pretty simple frustration: a lot of adaptation knowledge lives in Word docs and PDFs, which makes it hard to search, update, translate, or reuse. The goal here is to move that knowledge into a format that is easier to contribute to and easier to publish in multiple accessible outputs later.
 
-Right now the repository is a mix of:
-- a lightweight React + TypeScript app scaffold
-- shared TypeScript data models for toy metadata, pictures, and instruction steps
-- Supabase client wiring
-- product and UI prototypes exploring the contributor flow, manual output, and schematic tooling
+In practical terms, the project is trying to do three things:
+- capture toy and manual data through a contributor-friendly workflow
+- store that information in a schema that can support accessibility and localization
+- use that structured data as the source for future manual views, cards, exports, and other formats
 
-## Current State
+## Where The Project Is Right Now
 
-The live app code is still minimal. The most important source-of-truth files at the moment are:
-- `src/types.ts` for the shared data model
+This repository is still early. The React app is mostly a scaffold, while the strongest product thinking currently lives in the shared types, Supabase setup, and the prototype files.
+
+The most important files right now are:
+- `src/types.ts` for the current shared data model
 - `src/constants/languages.ts` for supported language codes
-- `src/utils/supabaseClient.ts` for database connection setup
-- `prototyping/` for UI and schema exploration
+- `src/utils/supabaseClient.ts` for the Supabase client
+- `prototyping/` for the current UI and schema experiments
+- `supabase/migrations/` for the checked-in schema direction
 
-The app does not yet implement the full end-to-end workflow. The prototypes currently carry most of the product thinking.
+At the moment, the app does not yet implement the full end-to-end workflow in React. The prototypes are doing a lot of the heavy lifting while the architecture and data model are being clarified.
+
+## Data Model Direction
+
+The current model is built around a few ideas:
+- localized text fields are stored as language-keyed objects
+- toys, pictures, and instruction steps are separate records
+- pictures can be reused across steps through a join table instead of being locked to a single step
+
+That means the project is moving toward:
+- `ToyMetadata` for core toy information
+- `PictureMetadata` for reusable media records
+- `InstructionStep` for ordered manual steps
+- a step-picture relationship layer so one step can have many pictures and one picture can appear in more than one step
 
 ## Tech Stack
 
-- Frontend: React 19 + TypeScript + Vite
+- Frontend: React 19, TypeScript, Vite
 - Database and storage: Supabase
-- Data model direction: localized JSON fields plus relational records for toys, pictures, and instruction steps
+- Prototyping: static HTML prototypes for contributor flows and manual output concepts
 
 ## Project Structure
 
-- `src/`: app entry point, shared types, constants, and Supabase setup
-- `prototyping/`: HTML and SQL prototypes for manual rendering, ingestion flows, and schema design
-- `src/assets/`: static images used by the frontend
+- `src/`: app entry point, shared types, constants, assets, and Supabase setup
+- `prototyping/`: HTML and SQL prototypes for manual entry, preview, and schema exploration
+- `supabase/migrations/`: migration files for the evolving database design
 
 ## Getting Started
 
 1. Install dependencies with `npm install`
-2. Add environment variables in `.env` or `.env.local`:
+2. Add the environment variables your frontend needs:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
-3. Start the dev server with `npm run dev`
+3. Start the app with `npm run dev`
 
 ## Accessibility Direction
 
-The project is aimed at reducing accessibility silos in toy adaptation documentation. The long-term goals include:
-- accessible manual output instead of only static documents
-- structured alt text and captions for images
-- multilingual content support
-- reusable manual data that can be reformatted for different needs later
+The long-term point of this project is not just to digitize manuals. It is to reduce the accessibility silo created by static document workflows.
+
+That includes:
+- building manual content that can be rendered in more than one format
+- keeping alt text and captions as first-class fields instead of afterthoughts
+- supporting multilingual content from the data model upward
+- making future low-bandwidth, screen-reader-friendly, or other accessibility-focused outputs possible
 
 ## Suggested Next 3 Steps
 
-1. Build a real contributor form in React that maps directly to `ToyMetadata` from `src/types.ts`.
-2. Save one complete toy record to Supabase, including at least one picture and one instruction step.
-3. Render that saved record back into a simple manual preview so the project has one full end-to-end slice.
-
+1. Build the first real React form that maps directly to the shared TypeScript types.
+2. Connect one complete toy record to Supabase, including step records and picture relationships.
+3. Render that saved data back into a simple manual preview so the project has one working end-to-end slice.

@@ -70,10 +70,20 @@ CREATE TABLE IF NOT EXISTS public.instruction_steps (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at timestamptz NOT NULL DEFAULT now(),
   toy_id uuid NOT NULL REFERENCES public.toy_metadata(id) ON DELETE CASCADE,
-  picture_id uuid NOT NULL REFERENCES public.pictures(picture_id) ON DELETE RESTRICT,
   step_number integer NOT NULL CHECK (step_number > 0),
   description jsonb NOT NULL DEFAULT '{}'::jsonb,
   UNIQUE (toy_id, step_number)
+);
+
+CREATE TABLE IF NOT EXISTS public.instruction_step_pictures (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  created_at timestamptz NOT NULL DEFAULT now(),
+  step_id uuid NOT NULL REFERENCES public.instruction_steps(id) ON DELETE CASCADE,
+  picture_id uuid NOT NULL REFERENCES public.pictures(picture_id) ON DELETE CASCADE,
+  display_order integer NOT NULL DEFAULT 1 CHECK (display_order > 0),
+  is_primary boolean NOT NULL DEFAULT false,
+  UNIQUE (step_id, picture_id),
+  UNIQUE (step_id, display_order)
 );
 
 CREATE INDEX IF NOT EXISTS idx_pictures_toy_id
@@ -82,8 +92,11 @@ CREATE INDEX IF NOT EXISTS idx_pictures_toy_id
 CREATE INDEX IF NOT EXISTS idx_instruction_steps_toy_id
   ON public.instruction_steps (toy_id);
 
-CREATE INDEX IF NOT EXISTS idx_instruction_steps_picture_id
-  ON public.instruction_steps (picture_id);
+CREATE INDEX IF NOT EXISTS idx_instruction_step_pictures_step_id
+  ON public.instruction_step_pictures (step_id);
+
+CREATE INDEX IF NOT EXISTS idx_instruction_step_pictures_picture_id
+  ON public.instruction_step_pictures (picture_id);
 
 CREATE INDEX IF NOT EXISTS idx_toy_metadata_name
   ON public.toy_metadata
@@ -96,6 +109,10 @@ CREATE INDEX IF NOT EXISTS idx_pictures_alt_text
 CREATE INDEX IF NOT EXISTS idx_instruction_steps_description
   ON public.instruction_steps
   USING gin (description);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_instruction_step_primary_picture
+  ON public.instruction_step_pictures (step_id)
+  WHERE is_primary;
 
 CREATE OR REPLACE FUNCTION public.set_updated_at()
 RETURNS trigger AS $$
