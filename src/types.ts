@@ -5,6 +5,7 @@ type ToyFeature = 'Light-Up' | 'Sound' | 'Motion'| 'Vibration' | 'Remote-Control
 type LocalizedText = Record<LanguageCode, string>;
 
 export interface ToyMetadata {
+  // Optional in the app before insert; Supabase/Postgres generates it on save.
   id?: string; 
   name: LocalizedText; 
   brand: string;
@@ -19,6 +20,7 @@ export interface ToyMetadata {
 }
 
 export interface InstructionStep {
+  // Optional in the app before insert; Supabase/Postgres generates it on save.
   id?: string;
   toy_id: string;
   step_number: number;
@@ -27,6 +29,7 @@ export interface InstructionStep {
 }
 
 export interface PictureMetadata {
+  // Generated client-side in createPictureEntry so pictures can be referenced before save.
   picture_id: string;
   toy_id: string;
   picture_url: string;             
@@ -35,6 +38,7 @@ export interface PictureMetadata {
 }
 
 export interface InstructionStepPicture {
+  // Optional in the app before insert; Supabase/Postgres generates it on save.
   id?: string;
   step_id: string;
   picture_id: string;

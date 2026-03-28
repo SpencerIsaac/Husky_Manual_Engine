@@ -18,7 +18,7 @@ The most important files right now are:
 - `src/constants/languages.ts` for supported language codes
 - `src/utils/supabaseClient.ts` for the Supabase client
 - `prototyping/` for the current UI and schema experiments
-- `supabase/migrations/` for the checked-in schema direction
+- `supabase/migrations/` for the checked-in schema and migration direction
 
 At the moment, the app does not yet implement the full end-to-end workflow in React. The prototypes are doing a lot of the heavy lifting while the architecture and data model are being clarified.
 
@@ -35,6 +35,15 @@ That means the project is moving toward:
 - `InstructionStep` for ordered manual steps
 - a step-picture relationship layer so one step can have many pictures and one picture can appear in more than one step
 
+The current SQL direction on `main` lives in:
+- `supabase/migrations/20260325_000001_initial_schema.sql`
+
+That file currently models:
+- `toy_metadata`
+- `pictures`
+- `instruction_steps`
+- `instruction_step_pictures`
+
 ## Tech Stack
 
 - Frontend: React 19, TypeScript, Vite
@@ -44,7 +53,7 @@ That means the project is moving toward:
 ## Project Structure
 
 - `src/`: app entry point, shared types, constants, assets, and Supabase setup
-- `prototyping/`: HTML and SQL prototypes for manual entry, preview, and schema exploration
+- `prototyping/`: HTML prototypes for manual entry and preview exploration
 - `supabase/migrations/`: migration files for the evolving database design
 
 ## Getting Started

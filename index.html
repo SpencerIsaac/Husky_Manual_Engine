@@ -1,13 +1,503 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>husky_manual_engine</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Husky OpenAdapt Lab | Open Infrastructure for Accessible AT Manuals</title>
+    <!-- Google Fonts:'Inter' as a modern sans-serif that pairs well with academic branding -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Icons (free solid/brands) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #ffffff;
+            color: #1a1a1a;
+            line-height: 1.5;
+            scroll-behavior: smooth;
+        }
+
+        .skip-link {
+            position: absolute;
+            left: 1rem;
+            top: -3rem;
+            z-index: 1000;
+            padding: 0.75rem 1rem;
+            background: var(--uw-purple);
+            color: var(--white);
+            border-radius: 0.75rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .skip-link:focus {
+            top: 1rem;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* UW Color Palette */
+        :root {
+            --uw-purple: #4b2e83;      /* UW primary purple */
+            --uw-gold: #e8e3d3;         /* UW light gold/cream for backgrounds */
+            --uw-metallic-gold: #b7a57a; /* accent gold */
+            --uw-dark: #1a1a1a;
+            --uw-gray: #5e6a71;
+            --uw-light-gray: #f8f9fa;
+            --white: #ffffff;
+            --shadow-sm: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Typography */
+        h1, h2, h3 {
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--uw-purple) 0%, #6a3e9e 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: var(--uw-purple);
+            border-left: 4px solid var(--uw-metallic-gold);
+            padding-left: 1rem;
+        }
+
+        h3 {
+            font-size: 1.35rem;
+            margin-bottom: 0.75rem;
+            color: #2d2d2d;
+        }
+
+        .section {
+            padding: 5rem 0;
+            border-bottom: 1px solid #eef2f4;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .bg-uw-light {
+            background-color: var(--uw-light-gray);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.75rem;
+            border-radius: 40px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            font-size: 0.95rem;
+        }
+
+        .btn-primary {
+            background-color: var(--uw-purple);
+            color: white;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+
+        .btn-primary:hover {
+            background-color: #3a2363;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .btn-outline {
+            border: 1.5px solid var(--uw-purple);
+            color: var(--uw-purple);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            background-color: var(--uw-purple);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Header & Navigation */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo h3 {
+            margin: 0;
+            color: var(--uw-purple);
+            font-weight: 700;
+            font-size: 1.6rem;
+        }
+
+        .logo p {
+            font-size: 0.8rem;
+            color: var(--uw-gray);
+            letter-spacing: 0.3px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #2c3e4f;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--uw-purple);
+        }
+
+        /* Hero */
+        .hero {
+            padding: 3rem 0 4rem 0;
+        }
+
+        .hero-grid {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 3rem;
+        }
+
+        .hero-content {
+            flex: 1.2;
+        }
+
+        .hero-visual {
+            flex: 0.8;
+            background: var(--uw-gold);
+            border-radius: 32px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .badge {
+            background: #ede7f3;
+            color: var(--uw-purple);
+            display: inline-block;
+            padding: 0.25rem 0.9rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Feature Cards */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 28px;
+            padding: 1.8rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.25s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+            border-color: #e2d9f0;
+        }
+
+        .card-icon {
+            font-size: 2.5rem;
+            color: var(--uw-purple);
+            margin-bottom: 1.2rem;
+        }
+
+        /* Stats / Impact */
+        .stats-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: 2rem;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .stat-item h3 {
+            font-size: 2.4rem;
+            margin-bottom: 0.25rem;
+            color: var(--uw-purple);
+        }
+
+        /* Team */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 24px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .team-card i {
+            font-size: 2.8rem;
+            color: var(--uw-metallic-gold);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #1f2a2e;
+            color: #cfdee5;
+            padding: 3rem 0 2rem;
+            margin-top: 2rem;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: #cfdee5;
+            margin-right: 1.5rem;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+            h1 {
+                font-size: 2.4rem;
+            }
+            h2 {
+                font-size: 1.8rem;
+            }
+            .navbar {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .hero-grid {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+<a class="skip-link" href="#main-content">Skip to main content</a>
+
+<!-- Navigation -->
+<header>
+    <div class="container">
+        <nav class="navbar" aria-label="Primary">
+            <div class="logo">
+                <h1 style="font-size: 1.6rem; margin-bottom: 0; background: none; color: var(--uw-purple); -webkit-background-clip: initial;">Husky OpenAdapt Lab</h1>
+                <p>University of Washington | Open Infrastructure for AT</p>
+            </div>
+            <div class="nav-links">
+                <a href="#vision">Vision</a>
+                <a href="#platform">Platform</a>
+                <a href="#contact">Contact</a>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main id="main-content">
+<!-- Hero Section -->
+<section class="hero" aria-labelledby="hero-title">
+    <div class="container">
+        <div class="hero-grid">
+            <div class="hero-content">
+                <div class="badge"><i class="fas fa-code-branch" aria-hidden="true"></i> Open Source · Schema-First · AI-Ready</div>
+                <h2 id="hero-title" style="font-size: 3.5rem; line-height: 1.2; margin-bottom: 1.5rem; background: linear-gradient(135deg, var(--uw-purple) 0%, #6a3e9e 100%); background-clip: text; -webkit-background-clip: text; color: transparent;">Scaling access to <span style="color: #4b2e83;">assistive technology</span> manuals — globally.</h2>
+                <p style="font-size: 1.2rem; color: #2d3e4b; margin-bottom: 2rem; max-width: 90%;">
+                    From fragmented PDFs to a dynamic, multilingual, low-bandwidth infrastructure. 
+                    Built for GoBabyGo, switch-adapted toys, and the entire DIY AT community.
+                </p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="#" class="btn btn-primary"><i class="fab fa-github" aria-hidden="true"></i> GitHub · Coming soon</a>
+                    <a href="#platform" class="btn btn-outline"><i class="fas fa-cogs" aria-hidden="true"></i> Explore the stack</a>
+                </div>
+                <div style="margin-top: 2rem; font-size: 0.85rem; color: #5e6a71;">
+                    <i class="fas fa-check-circle" style="color: #4b2e83;" aria-hidden="true"></i> In partnership with HuskyADAPT &nbsp;&nbsp;
+                    <i class="fas fa-globe" aria-hidden="true"></i> AI translation · Schema-driven · Accessible by design
+                </div>
+            </div>
+            <div class="hero-visual" role="img" aria-label="Concept illustration showing a path from PDF manuals to structured content and accessible multilingual outputs">
+                <i class="fas fa-book-open" style="font-size: 4rem; color: #4b2e83; opacity: 0.7;" aria-hidden="true"></i>
+                <i class="fas fa-language" style="font-size: 3rem; margin: 0 1rem; color: #b7a57a;" aria-hidden="true"></i>
+                <i class="fas fa-universal-access" style="font-size: 4rem; color: #4b2e83;" aria-hidden="true"></i>
+                <p style="margin-top: 1.5rem; font-weight: 500;"><span aria-hidden="true">📄 → 🧩 → 🌎</span><span class="sr-only">PDF to structured content to multilingual accessible outputs.</span> PDF → Structured content → Any language, any format</p>
+                <p style="font-size: 0.8rem; margin-top: 1rem;">One source of truth. Instant translation. Built for rural &amp; low-bandwidth communities.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Vision / Problem Section -->
+<section class="section" id="vision" aria-labelledby="vision-heading">
+    <div class="container">
+        <h2 id="vision-heading"><i class="fas fa-bullseye" style="margin-right: 0.75rem;" aria-hidden="true"></i> The documentation bottleneck</h2>
+        <div style="max-width: 800px; margin-bottom: 2rem;">
+            <p style="font-size: 1.1rem;">DIY assistive technology manuals are trapped in fragmented PDFs and Word files — inaccessible, outdated, and unavailable in most languages. Rural families, global makers, and clinicians lose hours searching for instructions that often don't exist in their language or bandwidth constraints.</p>
+        </div>
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-file-pdf"></i></div>
+                <h3>PDF silos</h3>
+                <p>Manuals live across random Google Drives, university pages, and forums. No version control, no discoverability.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-language"></i></div>
+                <h3>Language walls</h3>
+                <p>95% of manuals are English-only. Families in Peru, Kenya, or rural US can't adapt toys without costly translation.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-tachometer-alt"></i></div>
+                <h3>High bandwidth, low access</h3>
+                <p>PDFs are large; downloading manuals excludes communities with unreliable Wi-Fi. Our system delivers lightweight, text-first formats.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Platform / Solution Section -->
+<section class="section bg-uw-light" id="platform" aria-labelledby="platform-heading">
+    <div class="container">
+        <h2 id="platform-heading"><i class="fas fa-cubes" aria-hidden="true"></i> HuskyOpen Infrastructure</h2>
+        <p style="font-size: 1.1rem; max-width: 780px; margin-bottom: 2rem;">A headless, schema-driven pipeline that turns crowd-sourced adaptation knowledge into accessible, multilingual manuals — automatically.</p>
+        
+        <div class="cards-grid">
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-database"></i></div>
+                <h3>Standardized Schema</h3>
+                <p>Extract, Transform, Load framework. Every manual is structured once — parts, steps, warnings, images — and can be re-rendered for any audience.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-robot"></i></div>
+                <h3>AI-Powered Translation</h3>
+                <p>Native i18n support. Write in English, instantly generate manuals in Spanish, Swahili, Arabic, or any language. Low-cost, high-accuracy.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon"><i class="fas fa-mobile-alt"></i></div>
+                <h3>Multi-format Outputs</h3>
+                <p>Beginner style guide, expert cheat sheet, screen-reader optimized HTML, Braille-ready, and lightweight offline versions.</p>
+            </div>
+        </div>
+        <div style="background: white; border-radius: 28px; padding: 2rem; margin-top: 2rem; border-left: 6px solid var(--uw-metallic-gold);">
+            <i class="fas fa-chalkboard-teacher" style="font-size: 1.8rem; color: #4b2e83; float: left; margin-right: 1rem;" aria-hidden="true"></i>
+            <h3 style="margin-bottom: 0.5rem;">Content as a Service (CaaS) for AT</h3>
+            <p>One source of truth powers everything: dynamic web manuals, printable PDFs, and API access for organizations like Makers Making Change, GBG, and global clinics. No more outdated attachments — just live, versioned, accessible documentation.</p>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Roadmap & Get Involved -->
+<section class="section" id="contact" aria-labelledby="contact-heading">
+    <div class="container">
+        <div style="display: flex; flex-wrap: wrap; gap: 3rem; align-items: center;">
+            <div style="flex: 1;">
+                <h2 id="contact-heading" style="border-left: none; padding-left: 0;">Stay Tuned</h2>
+                <p style="font-size: 1.1rem;">We're reimagining grassroots assitive technology development through open documentation infrastructure.</p>
+                <address style="margin: 1.5rem 0; font-style: normal;">
+                    <div style="margin-bottom: 0.8rem;"><i class="fas fa-envelope" style="width: 2rem; color: #4b2e83;" aria-hidden="true"></i> hskyadpt@uw.edu</div>
+                    <div><i class="fab fa-github" style="width: 2rem; color: #4b2e83;" aria-hidden="true"></i> TBD</div>
+                </address>
+            </div>
+            <div style="flex: 1; background: var(--uw-gold); border-radius: 32px; padding: 2rem;" aria-labelledby="timeline-heading">
+                <h3 id="timeline-heading"><span aria-hidden="true">📅</span> Timeline</h3>
+                <ul style="margin-top: 1rem; padding-left: 1.25rem;">
+                    <li style="margin-bottom: 1rem;"><i class="fas fa-check-circle" style="color: #4b2e83;" aria-hidden="true"></i> Winter 2026 — HuskyADAPT Manual Making Team Pilot</li>
+                    <li style="margin-bottom: 1rem;"><i class="fas fa-check-circle" style="color: #4b2e83;" aria-hidden="true"></i> Spring 2026 — Conceptualization and Early Development</li>
+                    <li style="margin-bottom: 1rem;"><i class="fas fa-check-circle" style="color: #4b2e83;" aria-hidden="true"></i> Winter 2027 — RESNA Student Design Competition submission</li>
+                    <li><i class="fas fa-check-circle" style="color: #4b2e83;" aria-hidden="true"></i> 2027 — Integration and Iterative testing</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="footer-content">
+            <div>
+                <p style="font-weight: 600;">HuskyAdapt</p>
+                <p style="font-size: 0.8rem;">University of Washington · HuskyADAPT</p>
+                <p style="font-size: 0.75rem; margin-top: 0.5rem;">© 2026 · Open-source infrastructure for accessible AT manuals</p>
+            </div>
+            <nav class="footer-links" aria-label="Footer">
+                <a href="#vision">About</a>
+            </nav>
+        </div>
+        <div style="text-align: center; margin-top: 2rem; font-size: 0.7rem; opacity: 0.7;">
+            <i class="fas fa-universal-access" aria-hidden="true"></i> Designed with accessibility-first principles · Screen reader ready · Low-bandwidth friendly
+        </div>
+    </div>
+</footer>
+
+</body>
 </html>

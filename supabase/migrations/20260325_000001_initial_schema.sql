@@ -1,14 +1,23 @@
 -- Husky Manual Engine
--- Baseline schema migration aligned with src/types.ts as of 2026-03-25.
+-- This file is the saved SQL record of the database schema for the project.
+-- Think of it as the version-controlled copy of what you would run in Supabase
+-- to create or rebuild the schema structure.
 --
--- This migration is written to be safe to review and re-run in development:
+-- File name notes:
+-- - 20260325 = the date this schema file was created
+-- - 000001 = the migration order number
+-- - initial_schema = a short description of what the file contains
+--
+-- This migration is aligned with src/types.ts as of 2026-03-25.
+--
+-- It is written to be safer to review and re-run in development:
 -- - CREATE ... IF NOT EXISTS is used where possible
 -- - enum creation is guarded with pg_type checks
 -- - trigger replacement is explicit
 --
 -- If your hosted Supabase project already has a different live schema,
--- review this file before applying it so we can convert it into ALTER statements
--- instead of creating parallel structures.
+-- review this file before applying it so it can be turned into ALTER statements
+-- instead of creating overlapping structures.
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
