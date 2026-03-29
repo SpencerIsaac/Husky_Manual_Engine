@@ -21,6 +21,7 @@
 
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
 
+-- Create a controlled list of battery labels so records stay consistent.
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'battery_type') THEN
@@ -37,6 +38,7 @@ BEGIN
 END
 $$;
 
+-- Create a controlled list of toy features that a manual may refer to.
 DO $$
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'toy_feature') THEN
@@ -51,21 +53,29 @@ BEGIN
 END
 $$;
 
+-- Main toy table: one row per toy/manual record.
 CREATE TABLE IF NOT EXISTS public.toy_metadata (
+  -- Stable internal ID used by related tables.
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  -- Audit fields help with future editing workflows and version tracking.
   created_at timestamptz NOT NULL DEFAULT now(),
   updated_at timestamptz NOT NULL DEFAULT now(),
+  -- Localized fields are stored as JSON objects like {"en": "...", "es": "..."}.
   name jsonb NOT NULL DEFAULT '{}'::jsonb,
   brand text NOT NULL,
+  -- UPC is unique so the same product is not accidentally entered twice.
   upc text NOT NULL UNIQUE,
   purchase_link text NOT NULL,
   screw_type jsonb NOT NULL DEFAULT '{}'::jsonb,
   battery_type battery_type NOT NULL,
   battery_count integer NOT NULL CHECK (battery_count >= 0),
+  -- PostgreSQL can store an array of enum values for multi-feature toys.
   toy_feature toy_feature[] NOT NULL DEFAULT '{}'::toy_feature[],
   contributor text NOT NULL
 );
 
+-- Reusable image records live separately from steps.
+-- This makes it possible to use one picture in multiple places.
 CREATE TABLE IF NOT EXISTS public.pictures (
   picture_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at timestamptz NOT NULL DEFAULT now(),
@@ -75,26 +85,33 @@ CREATE TABLE IF NOT EXISTS public.pictures (
   caption jsonb NOT NULL DEFAULT '{}'::jsonb
 );
 
+-- Ordered procedural steps for a given toy/manual.
 CREATE TABLE IF NOT EXISTS public.instruction_steps (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at timestamptz NOT NULL DEFAULT now(),
   toy_id uuid NOT NULL REFERENCES public.toy_metadata(id) ON DELETE CASCADE,
+  -- Step numbers must be positive and unique within a single toy.
   step_number integer NOT NULL CHECK (step_number > 0),
   description jsonb NOT NULL DEFAULT '{}'::jsonb,
   UNIQUE (toy_id, step_number)
 );
 
+-- Join table connecting steps to pictures.
+-- This supports many-to-many reuse plus display metadata.
 CREATE TABLE IF NOT EXISTS public.instruction_step_pictures (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   created_at timestamptz NOT NULL DEFAULT now(),
   step_id uuid NOT NULL REFERENCES public.instruction_steps(id) ON DELETE CASCADE,
   picture_id uuid NOT NULL REFERENCES public.pictures(picture_id) ON DELETE CASCADE,
+  -- Controls the order pictures appear within a step.
   display_order integer NOT NULL DEFAULT 1 CHECK (display_order > 0),
+  -- Allows the UI to identify a single "hero" image for the step.
   is_primary boolean NOT NULL DEFAULT false,
   UNIQUE (step_id, picture_id),
   UNIQUE (step_id, display_order)
 );
 
+-- Foreign-key indexes keep related-record lookups fast.
 CREATE INDEX IF NOT EXISTS idx_pictures_toy_id
   ON public.pictures (toy_id);
 
@@ -107,6 +124,7 @@ CREATE INDEX IF NOT EXISTS idx_instruction_step_pictures_step_id
 CREATE INDEX IF NOT EXISTS idx_instruction_step_pictures_picture_id
   ON public.instruction_step_pictures (picture_id);
 
+-- GIN indexes help with searching inside JSONB localized text fields.
 CREATE INDEX IF NOT EXISTS idx_toy_metadata_name
   ON public.toy_metadata
   USING gin (name);
@@ -123,6 +141,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS idx_instruction_step_primary_picture
   ON public.instruction_step_pictures (step_id)
   WHERE is_primary;
 
+-- This trigger function automatically refreshes `updated_at`
+-- whenever a toy record changes.
 CREATE OR REPLACE FUNCTION public.set_updated_at()
 RETURNS trigger AS $$
 BEGIN
@@ -133,6 +153,7 @@ $$ LANGUAGE plpgsql;
 
 DROP TRIGGER IF EXISTS set_toy_metadata_updated_at ON public.toy_metadata;
 
+-- Attach the timestamp-updating behavior to the main toy table.
 CREATE TRIGGER set_toy_metadata_updated_at
 BEFORE UPDATE ON public.toy_metadata
 FOR EACH ROW

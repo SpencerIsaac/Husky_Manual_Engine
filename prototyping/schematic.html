@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>HuskyADAPT Soldering Diagram Export</title>
     <style>
+        /* Visual language for the diagram generator prototype. */
         :root { --uw-purple: #4b2e83; --uw-gold: #b7a57a; --bg: #f4f4f4; }
         body { font-family: "Segoe UI", Arial, sans-serif; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .workspace { display: flex; gap: 30px; background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 10px solid var(--uw-purple); }
@@ -49,13 +50,14 @@
 </div>
 
 <script>
+    // The canvas is the drawing surface for the exportable diagram preview.
     const canvas = document.getElementById('schematicCanvas');
     const ctx = canvas.getContext('2d');
     
     let activePins = new Set([5, 6]); // Default soldering points
     let pins = [];
 
-    // This function calculates coordinates based on the selected layout
+    // Calculate where each pin should appear in the preview based on the chosen layout.
     function calculatePinPositions() {
         const count = parseInt(document.getElementById('pinCount').value) || 0;
         const layout = document.getElementById('layoutSelect').value;
@@ -85,6 +87,7 @@
         }
     }
 
+    // Build the pin selector UI and redraw the canvas whenever inputs change.
     function initUI() {
         const grid = document.getElementById('pinGrid');
         const count = parseInt(document.getElementById('pinCount').value) || 0;
@@ -110,6 +113,7 @@
         draw();
     }
 
+    // Render the full diagram preview from the current inputs and selected pins.
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         const label = document.getElementById('labelInput').value;
@@ -158,6 +162,7 @@
         });
     }
 
+    // Small helper for drawing the rounded outer component body.
     function roundRect(ctx, x, y, w, h, r) {
         ctx.beginPath();
         ctx.moveTo(x + r, y);
@@ -168,6 +173,7 @@
         ctx.stroke();
     }
 
+    // Export the current canvas as a PNG so it can be placed into a manual or Word doc.
     function downloadImage() {
         const link = document.createElement('a');
         link.download = `HuskyADAPT_${document.getElementById('labelInput').value}.png`;
@@ -175,7 +181,7 @@
         link.click();
     }
 
-    // Launch!
+    // Initialize the prototype once the page loads.
     initUI();
 </script>
 

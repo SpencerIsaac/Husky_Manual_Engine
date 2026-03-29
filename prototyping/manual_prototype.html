@@ -4,8 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HuskyADAPT | Interactive Universal Manual</title>
+    <!-- Prototype note:
+         This file is a static concept demo for what an interactive manual could feel like.
+         It is not yet connected to React or Supabase. -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
+        /* Shared colors for the prototype. */
         :root {
             --uw-purple: #4b2e83;
             --uw-gold: #b7a57a;
@@ -148,12 +152,16 @@
 </head>
 <body>
 
+<!-- Sticky progress header:
+     this keeps completion feedback visible while the user scrolls through steps. -->
 <div class="header">
     <div style="font-weight: 800; font-size: 1.3rem;">HuskyADAPT <span style="font-weight: 400; opacity: 0.8;">| Manual</span></div>
     <div class="progress-container"><div id="progress-bar"></div></div>
     <div id="status">0 of 21 Steps Completed</div>
 </div>
 
+<!-- Manual feed:
+     each card represents a step the user can mark complete. -->
 <div class="manual-feed">
     
     <div class="section-header">Part 1: Initial Assessment</div>
@@ -290,6 +298,8 @@
 
 </div>
 
+<!-- Finish screen:
+     this appears only after every step card has been marked complete. -->
 <div id="finish-screen">
     <h1 style="color: var(--uw-purple); font-size: 3rem;">🎉 DONE!</h1>
     <p>The <span class="var">{Toy Name}</span> is ready for play.</p>
@@ -297,11 +307,13 @@
 </div>
 
 <script>
+    // Toggle a card between "done" and "not done", then refresh the progress UI.
     function toggleStep(card) {
         card.classList.toggle('completed');
         updateProgress();
     }
 
+    // Recalculate the progress bar and completion text.
     function updateProgress() {
         const steps = document.querySelectorAll('.step-card');
         const completed = document.querySelectorAll('.step-card.completed').length;
@@ -310,6 +322,7 @@
         document.getElementById('progress-bar').style.width = progress + '%';
         document.getElementById('status').innerText = `${completed} of ${steps.length} Steps Completed`;
 
+        // When all steps are complete, reveal the celebration screen after a short delay.
         if (completed === steps.length) {
             setTimeout(() => {
                 document.getElementById('finish-screen').style.display = 'flex';

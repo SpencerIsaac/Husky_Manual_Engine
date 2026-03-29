@@ -1,4 +1,6 @@
 {
+  // This root config mostly acts as a coordinator.
+  // It points TypeScript to the app config and the Node/Vite config.
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

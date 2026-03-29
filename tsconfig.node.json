@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
+    // Separate cache file for Node-side tooling such as Vite config.
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
     "target": "ES2023",
+    // Only Node runtime libraries are needed here, not browser APIs.
     "lib": ["ES2023"],
     "module": "ESNext",
+    // Expose Node-specific globals and types.
     "types": ["node"],
     "skipLibCheck": true,
 
@@ -22,5 +25,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
+  // Only the Vite config is checked with this Node-oriented setup.
   "include": ["vite.config.ts"]
 }
